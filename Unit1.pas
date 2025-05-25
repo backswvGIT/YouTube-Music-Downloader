@@ -7,11 +7,29 @@ uses
   System.Classes, Vcl.Graphics, Winapi.ShellAPI,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.WinXPanels, Vcl.ExtCtrls,
   uIniHelper, Clipbrd, FileCtrl, RegularExpressions,
-  Vcl.OleCtrls, SHDocVw,  Vcl.StdCtrls, Vcl.WinXCtrls,
+  Vcl.OleCtrls, SHDocVw, Vcl.StdCtrls, Vcl.WinXCtrls,
   IdBaseComponent, IdThreadComponent, JvComponentBase, JvComputerInfoEx,
   Vcl.ComCtrls, Vcl.CheckLst, System.JSON, System.NetEncoding, DateUtils,
   System.JSON.Readers, System.JSON.Types, Vcl.Imaging.pngimage,
-  Vcl.Touch.GestureMgr, System.IOUtils, Vcl.Menus, dxGDIPlusClasses;
+  Vcl.Touch.GestureMgr, System.IOUtils, Vcl.Menus, dxGDIPlusClasses,
+  Vcl.Themes, Vcl.Styles, scStyleManager, dxSkinsCore, dxSkinBasic,
+  dxSkinBlack, dxSkinBlue, dxSkinBlueprint, dxSkinCaramel, dxSkinCoffee,
+  dxSkinDarkroom, dxSkinDarkSide, dxSkinDevExpressDarkStyle,
+  dxSkinDevExpressStyle, dxSkinFoggy, dxSkinGlassOceans, dxSkinHighContrast,
+  dxSkiniMaginary, dxSkinLilian, dxSkinLiquidSky, dxSkinLondonLiquidSky,
+  dxSkinMcSkin, dxSkinMetropolis, dxSkinMetropolisDark, dxSkinMoneyTwins,
+  dxSkinOffice2007Black, dxSkinOffice2007Blue, dxSkinOffice2007Green,
+  dxSkinOffice2007Pink, dxSkinOffice2007Silver, dxSkinOffice2010Black,
+  dxSkinOffice2010Blue, dxSkinOffice2010Silver, dxSkinOffice2013DarkGray,
+  dxSkinOffice2013LightGray, dxSkinOffice2013White, dxSkinOffice2016Colorful,
+  dxSkinOffice2016Dark, dxSkinOffice2019Black, dxSkinOffice2019Colorful,
+  dxSkinOffice2019DarkGray, dxSkinOffice2019White, dxSkinPumpkin, dxSkinSeven,
+  dxSkinSevenClassic, dxSkinSharp, dxSkinSharpPlus, dxSkinSilver,
+  dxSkinSpringtime, dxSkinStardust, dxSkinSummer2008, dxSkinTheAsphaltWorld,
+  dxSkinTheBezier, dxSkinValentine, dxSkinVisualStudio2013Blue,
+  dxSkinVisualStudio2013Dark, dxSkinVisualStudio2013Light, dxSkinVS2010,
+  dxSkinWhiteprint, dxSkinWXI, dxSkinXmas2008Blue, dxCore, cxClasses,
+  cxLookAndFeels, dxSkinsForm;
 
 type
   TForm1 = class(TForm)
@@ -45,6 +63,8 @@ type
     img3: TImage;
     img11: TImage;
     lbl41: TLabel;
+    Label1: TLabel;
+    ComboBox1: TComboBox;
     procedure FormCreate(Sender: TObject);
     procedure btn3Click(Sender: TObject);
     procedure tglswtch1Click(Sender: TObject);
@@ -69,8 +89,11 @@ type
     procedure Rename1Click(Sender: TObject);
     procedure Play1Click(Sender: TObject);
     procedure img3Click(Sender: TObject);
+    procedure dxSkinController1SkinForm(Sender: TObject; AForm: TCustomForm;
+      var ASkinName: string; var UseSkin: Boolean);
+    procedure ComboBox1Change(Sender: TObject);
   private
-
+    StyleManager: TStyleManager;
     FChangeHandle: THandle;
     procedure StartWatching(const ADirectory: string);
     procedure StopWatching;
@@ -184,7 +207,8 @@ begin
   begin
     f := fllst1.FileName;
 
-    if MessageDlg('Delete this file: "' + ExtractFileName(f) + '"?', mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+    if MessageDlg('Delete this file: "' + ExtractFileName(f) + '"?',
+      mtConfirmation, [mbYes, mbNo], 0) = mrYes then
     begin
       if DeleteFile(f) then
         ShowMessage('File deleted.')
@@ -194,6 +218,32 @@ begin
   end
   else
     ShowMessage('Please select a file first.');
+end;
+
+procedure SetControlSkinName(AControl: TWinControl; const ASkinName: string);
+var
+  AIntf: IcxLookAndFeelContainer;
+  I: Integer;
+begin
+  if Supports(AControl, IcxLookAndFeelContainer, AIntf) then
+  begin
+    AIntf.GetLookAndFeel.NativeStyle := False;
+    AIntf.GetLookAndFeel.SkinName := ASkinName;
+  end;
+  for I := 0 to AControl.ControlCount - 1 do
+    if AControl.Controls[I] is TWinControl then
+      SetControlSkinName(TWinControl(AControl.Controls[I]), ASkinName);
+end;
+
+procedure TForm1.dxSkinController1SkinForm(Sender: TObject; AForm: TCustomForm;
+  var ASkinName: string; var UseSkin: Boolean);
+begin
+  if AForm = Form1 then
+  begin
+    ASkinName := 'Metropolis';
+    UseSkin := True;
+    SetControlSkinName(AForm, ASkinName);
+  end;
 end;
 
 procedure TForm1.edt1Change(Sender: TObject);
@@ -207,7 +257,7 @@ begin
   // pm1
   if fllst1.ItemIndex <> -1 then
   begin
-     pm1.Popup(Mouse.CursorPos.X,Mouse.CursorPos.Y)
+    pm1.Popup(Mouse.CursorPos.X, Mouse.CursorPos.Y)
   end;
 end;
 
@@ -276,7 +326,8 @@ begin
     Ext := ExtractFileExt(fllst1.Items[fllst1.ItemIndex]);
 
     // รับชื่อใหม่จากผู้ใช้
-    NewNameOnly := InputBox('Rename File', 'New file name (without extension):', OldNameOnly);
+    NewNameOnly := InputBox('Rename File', 'New file name (without extension):',
+      OldNameOnly);
 
     // ถ้ามีการกรอกชื่อใหม่ และไม่ว่าง
     if (NewNameOnly <> '') and (NewNameOnly <> OldNameOnly) then
@@ -298,16 +349,16 @@ begin
     ShowMessage('Please select a file to rename.');
 end;
 
-
-function IsYouTubeID(const S: string): Boolean;
+function IsYouTubeID(const s: string): Boolean;
 var
-  i: Integer;
+  I: Integer;
 begin
-  Result := Length(S) = 11;
-  if not Result then Exit;
+  Result := Length(s) = 11;
+  if not Result then
+    Exit;
 
-  for i := 1 to 11 do
-    if not (S[i] in ['a'..'z', 'A'..'Z', '0'..'9', '-', '_']) then
+  for I := 1 to 11 do
+    if not(s[I] in ['a' .. 'z', 'A' .. 'Z', '0' .. '9', '-', '_']) then
       Exit(False);
 
   Result := True;
@@ -315,16 +366,16 @@ end;
 
 procedure TForm1.Renameall1Click(Sender: TObject);
 var
-  i: Integer;
-  oldName, newName, baseName, ext: string;
+  I: Integer;
+  oldName, newName, baseName, Ext: string;
   pStart, pEnd: Integer;
   bracketContent: string;
 begin
-  for i := 0 to fllst1.Items.Count - 1 do
+  for I := 0 to fllst1.Items.Count - 1 do
   begin
-    oldName := IncludeTrailingPathDelimiter(fllst1.Directory) + fllst1.Items[i];
-    ext := ExtractFileExt(oldName);
-    baseName := ChangeFileExt(fllst1.Items[i], '');
+    oldName := IncludeTrailingPathDelimiter(fllst1.Directory) + fllst1.Items[I];
+    Ext := ExtractFileExt(oldName);
+    baseName := ChangeFileExt(fllst1.Items[I], '');
 
     // หาตำแหน่งของ [ ... ] ที่อยู่ท้ายชื่อ
     pEnd := LastDelimiter(']', baseName);
@@ -338,7 +389,8 @@ begin
       if IsYouTubeID(bracketContent) then
       begin
         baseName := Trim(Copy(baseName, 1, pStart - 1));
-        newName := IncludeTrailingPathDelimiter(fllst1.Directory) + baseName + ext;
+        newName := IncludeTrailingPathDelimiter(fllst1.Directory) +
+          baseName + Ext;
 
         if not SameText(oldName, newName) then
         begin
@@ -366,7 +418,6 @@ begin
       Result := Result + Line + sLineBreak;
   Result := Result.Trim;
 end;
-
 
 procedure TForm1.RunCommandAndCaptureOutput(const CommandLine: string);
 var
@@ -411,9 +462,9 @@ begin
           j := Pos('[download] Destination:', s);
           if j = 1 then
           begin
-            s := s.Remove(1,24);
+            s := s.Remove(1, 24);
             s := RemoveEmptyLines(s);
-            lbl1.Caption:=s;
+            lbl1.Caption := s;
           end
           else
             mmo1.Lines.Add(s); // [download] Destination:
@@ -435,6 +486,7 @@ procedure TForm1.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 var
   Ini: TIniHelper;
   p: string;
+  I: Integer;
 begin
   p := ExtractFilePath(ParamStr(0));
   Ini := TIniHelper.Create(p + 'config.ini');
@@ -442,7 +494,14 @@ begin
   if tglswtch1.State = tssOn then
     Ini.WriteBool('setting', 'tglswtch1', True)
   else
-    Ini.WriteBool('setting', 'tglswtch1', false);
+    Ini.WriteBool('setting', 'tglswtch1', False);
+  Ini.WriteInteger('setting', 'style', ComboBox1.ItemIndex);
+  for I := 0 to ComboBox1.Items.Count - 1 do
+  begin
+    p := ComboBox1.Items[I];
+    Ini.WriteString('style', IntToStr(I), p);
+    Ini.WriteInteger('style', 'count', I);
+  end;
   Ini.Free;
 end;
 
@@ -514,17 +573,38 @@ end;
 
 procedure TForm1.FormCreate(Sender: TObject);
 var
+  I, c: Integer;
   Ini: TIniHelper;
-  p: string;
+  p, s: string;
   DllPath: string;
+
 begin
+  StyleManager := TStyleManager.Create;
   p := ExtractFilePath(ParamStr(0));
   Ini := TIniHelper.Create(p + 'config.ini');
+
+  c := Ini.ReadInteger('style', 'count', 0);
+  if c > 0 then
+  begin
+    for I := 0 to c do
+    begin
+      s := Ini.ReadString('style', IntToStr(I), '');
+      if Length(s) > 1 then
+
+        ComboBox1.Items.Add(s);
+    end;
+  end
+  else
+  begin
+    for I := 0 to Length(TStyleManager.StyleNames) - 1 do
+      ComboBox1.Items.Add(TStyleManager.StyleNames[I]);
+  end;
+  ComboBox1.ItemIndex := Ini.ReadInteger('setting', 'style', 0);
   Cur := Ini.ReadString('setting', 'Cur', p);
   lbl3.Caption := 'save to ' + Cur;
   lbl3.Hint := Cur;
   img5.Hint := Cur;
-  crdpnl1.ActiveCard:=crd1;
+  crdpnl1.ActiveCard := crd1;
   fllst1.Directory := Cur;
   StartWatching(Cur);
   tmr1.Interval := 1000;
@@ -548,7 +628,7 @@ begin
     Pathdll := p + 'youtube.dll';
 
   tglswtch1Click(Self);
-
+  ComboBox1Change(Self);
 end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
@@ -560,7 +640,7 @@ procedure TForm1.StartWatching(const ADirectory: string);
 begin
   StopWatching; // เผื่อมีการเรียกซ้ำ
 
-  FChangeHandle := FindFirstChangeNotification(PChar(ADirectory), false,
+  FChangeHandle := FindFirstChangeNotification(PChar(ADirectory), False,
     FILE_NOTIFY_CHANGE_FILE_NAME or FILE_NOTIFY_CHANGE_DIR_NAME);
 
   if FChangeHandle = INVALID_HANDLE_VALUE then
@@ -585,6 +665,11 @@ begin
     // ตั้งค่าสำหรับการเฝ้ารอบถัดไป
     FindNextChangeNotification(FChangeHandle);
   end;
+end;
+
+procedure TForm1.ComboBox1Change(Sender: TObject);
+begin
+  StyleManager.TrySetStyle(ComboBox1.Text);
 end;
 
 procedure TForm1.idthrdcmpnt1Run(Sender: TIdThreadComponent);
@@ -629,7 +714,8 @@ var
 begin
   if fllst1.ItemIndex <> -1 then
   begin
-    FilePath := IncludeTrailingPathDelimiter(fllst1.Directory) + fllst1.Items[fllst1.ItemIndex];
+    FilePath := IncludeTrailingPathDelimiter(fllst1.Directory) + fllst1.Items
+      [fllst1.ItemIndex];
     ShellExecute(Handle, 'open', PChar(FilePath), nil, nil, SW_SHOWNORMAL);
   end
   else
@@ -666,12 +752,16 @@ end;
 procedure TForm1.tmr1Timer(Sender: TObject);
 begin
   CheckForChanges;
-  if fllst1.Items.Count=0 then
+  if fllst1.Items.Count = 0 then
   begin
-    if spltvw1.Visible then  spltvw1.Visible:=false;
+    if spltvw1.Visible then
+      spltvw1.Visible := False;
 
-  end else begin
-      if spltvw1.Visible=false then  spltvw1.Visible:=True;
+  end
+  else
+  begin
+    if spltvw1.Visible = False then
+      spltvw1.Visible := True;
   end;
 end;
 

@@ -93,8 +93,11 @@ object Form1: TForm1
           Top = 78
           Width = 475
           Height = 44
+          Alignment = taCenter
           AutoSize = False
+          BiDiMode = bdRightToLeft
           Caption = 'Saveto'
+          ParentBiDiMode = False
           WordWrap = True
         end
         object img4: TImage
@@ -1521,6 +1524,22 @@ object Form1: TForm1
         Caption = 'backswva'
         OnClick = lbl4Click
       end
+      object Label1: TLabel
+        Left = 256
+        Top = 160
+        Width = 30
+        Height = 15
+        Caption = 'Styles'
+      end
+      object ComboBox1: TComboBox
+        Left = 256
+        Top = 176
+        Width = 145
+        Height = 23
+        Style = csDropDownList
+        TabOrder = 0
+        OnChange = ComboBox1Change
+      end
     end
   end
   object jvcmptrnfx1: TJvComputerInfoEx
@@ -1543,8 +1562,8 @@ object Form1: TForm1
     Priority = tpNormal
     StopMode = smTerminate
     OnRun = idthrdcmpnt2Run
-    Left = 601
-    Top = 97
+    Left = 521
+    Top = 49
   end
   object gstrmngr1: TGestureManager
     Left = 473
@@ -1563,8 +1582,8 @@ object Form1: TForm1
   end
   object tmr1: TTimer
     OnTimer = tmr1Timer
-    Left = 394
-    Top = 105
+    Left = 474
+    Top = 49
   end
   object pm1: TPopupMenu
     Left = 73
