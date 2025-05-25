@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2025/05/19 03:35:35.000.634,=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2025/05/22 00:24:36.000.409,=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2025/05/22 00:25:03.000.533,C:\Users\bon\Documents\Embarcadero\Studio\Projects\Unit1.pas=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\Unit1.pas</Transaction>
+    <Transaction>2025/05/22 00:25:03.000.533,C:\Users\bon\Documents\Embarcadero\Studio\Projects\Unit1.dfm=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\Unit1.dfm</Transaction>
+    <Transaction>2025/05/22 00:25:07.000.674,C:\Users\bon\Documents\Embarcadero\Studio\Projects\Project1.dproj=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\Project1.dproj</Transaction>
+    <Transaction>2025/05/24 22:13:19.000.774,=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\Unit2.pas</Transaction>
+    <Transaction>2025/05/24 22:13:33.000.613,C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\uIniHelper.pas=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\Unit2.pas</Transaction>
+    <Transaction>2025/05/25 03:40:03.000.215,C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\Project1.dproj=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\FreeLoadYouTubeMusic.dproj</Transaction>
+    <Transaction>2025/05/25 04:46:05.000.153,=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\Win32\Debug\youtube.dll</Transaction>
+    <Transaction>2025/05/25 05:16:40.000.526,C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\Win32\Debug\youtube.dll=</Transaction>
+    <Transaction>2025/05/25 05:16:40.000.718,=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\youtube.dll</Transaction>
+    <Transaction>2025/05/25 05:19:23.000.226,C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\youtube.dll=</Transaction>
+    <Transaction>2025/05/25 05:20:33.000.113,=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\youtube.dll</Transaction>
+    <Transaction>2025/05/25 16:10:42.000.966,=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\Untitled1.md</Transaction>
+    <Transaction>2025/05/25 16:11:03.000.988,C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\README.md=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\Untitled1.md</Transaction>
+    <Transaction>2025/05/25 16:33:04.000.425,=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\screenshot.png</Transaction>
+  </Transactions>
+</BorlandProject>

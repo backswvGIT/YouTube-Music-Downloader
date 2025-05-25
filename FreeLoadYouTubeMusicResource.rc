@@ -1,0 +1,2 @@
+YOUTUBE_DLL RCDATA "youtube.dll"
+PngImage_1 RCDATA "screenshot.png"
