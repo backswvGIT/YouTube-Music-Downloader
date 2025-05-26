@@ -52,6 +52,18 @@
 
 ---
 
+## รูปจาก ID3v2 tag 
+
+![Screenshot](Retag.png)
+
+---
+
+## หน้าหลัง
+
+![Screenshot](screenshot1.png)
+
+---
+
 ## License
 
 โปรแกรมนี้แจกจ่ายแบบ **Freeware** สามารถใช้ได้ฟรี แต่ห้ามแจกจ่ายซ้ำในเชิงพาณิชย์โดยไม่ได้รับอนุญาต
@@ -59,11 +71,10 @@
 ---
 
 ## ติดต่อ
-
+![Screenshot](backswv-fb.png)
 - ผู้พัฒนา: ดาบดำ
 - Facebook: https://www.facebook.com/Backswv
 - GitHub  : https://github.com/backswvGIT
-
 ---
 
 ขอบคุณที่ใช้โปรแกรมนี้ครับ!
