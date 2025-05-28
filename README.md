@@ -49,6 +49,7 @@
 ## ตัวอย่าง Screenshot
 
 ![Screenshot](screenshot.png)
+![Uploading screenshot.png…]()
 
 ---
 
