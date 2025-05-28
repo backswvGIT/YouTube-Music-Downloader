@@ -4,7 +4,7 @@ interface
 
 uses
   Winapi.Windows, TlHelp32, Winapi.Messages, System.SysUtils, System.Variants,
-  System.Classes, Vcl.Graphics, Winapi.ShellAPI,  System.UITypes,
+  System.Classes, Vcl.Graphics, Winapi.ShellAPI, System.UITypes,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.WinXPanels, Vcl.ExtCtrls,
   uIniHelper, Clipbrd, FileCtrl, RegularExpressions,
   Vcl.OleCtrls, SHDocVw, Vcl.StdCtrls, Vcl.WinXCtrls,
@@ -12,25 +12,23 @@ uses
   Vcl.ComCtrls, Vcl.CheckLst, System.JSON, System.NetEncoding, DateUtils,
   System.JSON.Readers, System.JSON.Types, Vcl.Imaging.pngimage,
   Vcl.Touch.GestureMgr, System.IOUtils, Vcl.Menus, dxGDIPlusClasses,
-  Vcl.Themes, Vcl.Styles;
+  Winapi.ShlObj, Winapi.ActiveX,
+  Vcl.Themes, Vcl.Styles, Vcl.Shell.ShellCtrls, Vcl.Shell.ShellConsts,
+  DragDrop, DropSource, DragDropFile, System.Skia, Vcl.Skia, AdvBadge,
+  AdvMetroProgressBar, System.ImageList, Vcl.ImgList, Unit2;
 
 type
   TForm1 = class(TForm)
 
     crdpnl1: TCardPanel;
     crd1: TCard;
-    tglswtch1: TToggleSwitch;
     lbl1: TLabel;
     edt1: TEdit;
-    lbl2: TLabel;
     lbl3: TLabel;
-    jvcmptrnfx1: TJvComputerInfoEx;
-    idthrdcmpnt1: TIdThreadComponent;
+    info: TJvComputerInfoEx;
     idthrdcmpnt2: TIdThreadComponent;
     mmo1: TMemo;
-    gstrmngr1: TGestureManager;
     crd2: TCard;
-    lbl6: TLabel;
     spltvw1: TSplitView;
     fllst1: TFileListBox;
     pnl1: TPanel;
@@ -40,11 +38,7 @@ type
     Rename1: TMenuItem;
     Renameall1: TMenuItem;
     Delete1: TMenuItem;
-    img2: TImage;
-    img4: TImage;
-    img5: TImage;
     img6: TImage;
-    img3: TImage;
     img11: TImage;
     lbl41: TLabel;
     Label1: TLabel;
@@ -54,23 +48,45 @@ type
     imgYouTube: TImage;
     tmSlide: TTimer;
     ActivityIndicator1: TActivityIndicator;
-    imgStop: TImage;
     tmr2: TTimer;
     idthrdcmpnt3: TIdThreadComponent;
-    img1: TImage;
     lblPRO: TLabel;
     KillProc: TIdThreadComponent;
     ProcThumbnail: TIdThreadComponent;
-    imgRef: TImage;
-    imgRecheck: TImage;
+    pnl2: TPanel;
+    cmbQuality: TComboBox;
+    gstrmngr1: TGestureManager;
+    btnMP3: TSkSvg;
+    btnMP4: TSkSvg;
+    grdpnl1: TGridPanel;
+    pnlg: TPanel;
+    pnlr: TPanel;
+    AdvBadge1: TAdvBadgeLabel;
+    btOpen: TSkSvg;
+    sksvgLoad: TSkSvg;
+    sksvgcancel: TSkSvg;
+    sksvgtuh: TSkSvg;
+    sksvgref: TSkSvg;
+    sksvgfen: TSkSvg;
+    sksvgtuh1: TSkSvg;
+    pnl3: TPanel;
+    pnl4: TPanel;
+    lblStatus: TLabel;
+    pnl41: TPanel;
+    lblStatus1: TLabel;
+    pnl42: TPanel;
+    lblStatus2: TLabel;
+    prog1: TAdvMetroProgressBar;
+    prog2: TAdvMetroProgressBar;
+    BalloonHint1: TBalloonHint;
+    ImageList1: TImageList;
+
     procedure FormCreate(Sender: TObject);
     procedure btn3Click(Sender: TObject);
-    procedure tglswtch1Click(Sender: TObject);
+    procedure tglswtch1Click();
     procedure btn2Click(Sender: TObject);
     procedure btn1Click(Sender: TObject);
     procedure tglswtch2Click(Sender: TObject);
-    procedure edt1Change(Sender: TObject);
-    procedure idthrdcmpnt1Run(Sender: TIdThreadComponent);
     procedure idthrdcmpnt2Run(Sender: TIdThreadComponent);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure lbl4Click(Sender: TObject);
@@ -107,6 +123,18 @@ type
     procedure ProcThumbnailRun(Sender: TIdThreadComponent);
     procedure imgRefClick(Sender: TObject);
     procedure imgRecheckClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure btnMP4Click(Sender: TObject);
+    procedure btnMP3Click(Sender: TObject);
+    procedure AdvBadge1BadgeClick(Sender: TObject);
+    procedure fllst1MouseUp(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure lblStatus2MouseUp(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure lblStatus1MouseUp(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure lblStatusMouseUp(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
 
   private
     StopNow: Boolean;
@@ -114,19 +142,24 @@ type
     SlideDirection: Integer; //
     SlideTarget: TCard;
 
-
     StyleManager: TStyleManager;
     FChangeHandle: THandle;
+    FPlaylist: TStringList;
+    FIniHelper: TIniHelper;
+    procedure UpdateBadge;
+    procedure SavePlaylist;
+    procedure LoadPlaylist;
+
     procedure ProcessAllFiles;
     procedure ProcessAllFiles2;
     procedure SwitchCardAnimated;
-
+    procedure ToggleMP3MP4();
     procedure StartWatching(const ADirectory: string);
     procedure StopWatching;
     procedure CheckForChanges;
 
     procedure RunCommandAndCaptureOutput(const CommandLine: string);
-
+    procedure ShowBalloonHintNow(Control: TControl; const HintText: string);
   public
 
     FActiveFFmpegCount: Integer;
@@ -137,6 +170,8 @@ type
     function SafeReplaceFile(const TargetFile, SourceFile: string): Boolean;
     function IsFileAccessible(const FileName: string): Boolean;
     procedure SafeDeleteFile(const FileName: string);
+
+    procedure delFPlaylist(const j: Integer);
   end;
 
 var
@@ -147,6 +182,8 @@ implementation
 {$R *.dfm}
 
 var
+  sURL: string;
+
   command, Pathdll, Cur, ff: string;
   SlideDirection: Integer;
   SlideStep: Integer;
@@ -154,7 +191,92 @@ var
   SlideNewCard, SlideOldCard: TCard;
   TProgress: double;
   TItemInfo, TnameMusic: string;
-  artist, album ,genre  :string;
+  artist, album, genre: string;
+  MP3, MP4: Boolean;
+
+procedure TForm1.SavePlaylist;
+var
+  I: Integer;
+begin
+  FIniHelper.WriteInteger('Playlist', 'Count', FPlaylist.Count);
+  for I := 0 to FPlaylist.Count - 1 do
+    FIniHelper.WriteString('Playlist', 'Item' + IntToStr(I), FPlaylist[I]);
+end;
+
+procedure TForm1.LoadPlaylist;
+var
+  I, Count: Integer;
+  Item: string;
+begin
+  FPlaylist.Clear;
+  Count := FIniHelper.ReadInteger('Playlist', 'Count', 0);
+  for I := 0 to Count - 1 do
+  begin
+    Item := FIniHelper.ReadString('Playlist', 'Item' + IntToStr(I), '');
+    if Item <> '' then
+      FPlaylist.Add(Item);
+  end;
+end;
+
+procedure TForm1.UpdateBadge;
+begin
+
+  AdvBadge1.Badge := IntToStr(FPlaylist.Count);
+  AdvBadge1.Visible := FPlaylist.Count > 0;
+end;
+
+procedure TForm1.delFPlaylist(const j: Integer);
+begin
+  // ตรวจสอบว่า Playlist ไม่ว่าง
+  if FPlaylist.IsEmpty then
+  begin
+    mmo1.Lines.Add('ไม่สามารถลบได้: Playlist ว่างอยู่แล้ว');
+    Exit; // ออกจากเมธอดหากไม่มีข้อมูล
+  end;
+
+  // แสดง URL ที่กำลังจะลบ (รายการแรก)
+  mmo1.Lines.Add('กำลังลบรายการ: ' + FPlaylist[j]);
+
+  // ลบรายการแรกออกจาก Playlist
+  FPlaylist.Delete(j);
+
+  // บันทึกการเปลี่ยนแปลง
+  SavePlaylist;
+
+  // อัปเดตการแสดงผล
+  UpdateBadge;
+
+  // แสดงสถานะปัจจุบัน
+  if FPlaylist.IsEmpty then
+  begin
+    mmo1.Lines.Add('ลบรายการเรียบร้อย - Playlist ว่างแล้ว');
+    edt1.Text := ''; // เคลียร์ช่องกรอกหากไม่มีข้อมูล
+  end
+  else
+  begin
+    mmo1.Lines.Add('ลบรายการเรียบร้อย - จำนวนรายการเหลือ: ' +
+      IntToStr(FPlaylist.Count));
+    edt1.Text := FPlaylist[0]; // แสดงรายการใหม่แรก
+  end;
+end;
+
+procedure TForm1.AdvBadge1BadgeClick(Sender: TObject);
+var
+  I: Integer;
+  ListStr: string;
+begin
+  if FPlaylist.Count = 0 then
+  begin
+    ShowMessage('ไม่มีรายการใน Playlist');
+    Exit;
+  end;
+
+  ListStr := 'รายการ Playlist:' + sLineBreak;
+  for I := 0 to FPlaylist.Count - 1 do
+    ListStr := ListStr + Format('%d. %s', [I + 1, FPlaylist[I]]) + sLineBreak;
+
+  ShowMessage(ListStr);
+end;
 
 function TryRemoveFile(const FileName: string): Boolean;
 var
@@ -175,8 +297,8 @@ begin
   end;
 end;
 
-  procedure ParseYTDLPOutput(const OutputText: string;
-  var ProgressPercent: Double; var CurrentItem: string);
+procedure ParseYTDLPOutput(const OutputText: string;
+  var ProgressPercent: double; var CurrentItem: string);
 var
   RegEx: TRegEx;
   Match: TMatch;
@@ -202,12 +324,11 @@ begin
   end;
 end;
 
-
 procedure KillProcessesByName(const ProcessNames: array of string);
 var
   hSnapshot: THandle;
   ProcessEntry: TProcessEntry32;
-  i: Integer;
+  I: Integer;
   hProcess: THandle;
 begin
   // Create a snapshot of all processes
@@ -222,10 +343,10 @@ begin
     begin
       repeat
         // Check against each process name we're looking for
-        for i := Low(ProcessNames) to High(ProcessNames) do
+        for I := Low(ProcessNames) to High(ProcessNames) do
         begin
-          if SameText(ExtractFileName(ProcessEntry.szExeFile), ProcessNames[i])
-            or SameText(ProcessEntry.szExeFile, ProcessNames[i]) then
+          if SameText(ExtractFileName(ProcessEntry.szExeFile), ProcessNames[I])
+            or SameText(ProcessEntry.szExeFile, ProcessNames[I]) then
           begin
             // Try to open the process with terminate rights
             hProcess := OpenProcess(PROCESS_TERMINATE, False,
@@ -269,39 +390,79 @@ procedure TForm1.ImageMouseEnter(Sender: TObject);
 var
   Img: TImage;
 begin
-  Img := Sender as TImage;
-  Img.Tag := (Img.Left shl 16) or Img.Top; // ซ่อนตำแหน่งเดิมใน Tag
-  Img.Left := Img.Left - 1;
-  Img.Top := Img.Top - 1;
+  if Sender is TImage then
+  begin
+    Img := TImage(Sender);
+    Img.Tag := (Img.Left shl 16) or Img.Top; // ซ่อนตำแหน่งเดิมใน Tag
+    Img.Left := Img.Left - 1;
+    Img.Top := Img.Top - 1;
+  end
+  else if Sender is TSkSvg then
+  begin
+    // ถ้า TSkSvg มีคุณสมบัติ Left/Top แบบเดียวกัน:
+    // สมมุติว่าใช้ชื่อว่า Svg: TSkSvg;
+    var
+    Svg := TSkSvg(Sender);
+    Svg.Tag := (Svg.Left shl 16) or Svg.Top;
+    Svg.Left := Svg.Left - 1;
+    Svg.Top := Svg.Top - 1;
+  end;
 end;
 
 procedure TForm1.ImageMouseLeave(Sender: TObject);
-var
-  Img: TImage;
 begin
-  Img := Sender as TImage;
-  Img.Left := Img.Tag shr 16;
-  Img.Top := Img.Tag and $FFFF;
+  if Sender is TImage then
+  begin
+    var
+    Img := TImage(Sender);
+    Img.Left := Img.Tag shr 16;
+    Img.Top := Img.Tag and $FFFF;
+  end
+  else if Sender is TSkSvg then
+  begin
+    var
+    Svg := TSkSvg(Sender);
+    Svg.Left := Svg.Tag shr 16;
+    Svg.Top := Svg.Tag and $FFFF;
+  end;
 end;
 
 procedure TForm1.ImageMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
-var
-  Img: TImage;
 begin
-  Img := Sender as TImage;
-  Img.Left := Img.Left + 2;
-  Img.Top := Img.Top + 2;
+  if Sender is TImage then
+  begin
+    var
+    Img := TImage(Sender);
+    Img.Left := Img.Left + 2;
+    Img.Top := Img.Top + 2;
+  end
+  else if Sender is TSkSvg then
+  begin
+    var
+    Svg := TSkSvg(Sender);
+    Svg.Left := Svg.Left + 2;
+    Svg.Top := Svg.Top + 2;
+  end;
 end;
 
 procedure TForm1.ImageMouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
-var
-  Img: TImage;
 begin
-  Img := Sender as TImage;
-  Img.Left := Img.Left - 2;
-  Img.Top := Img.Top - 2;
+  if Sender is TImage then
+  begin
+    var
+    Img := TImage(Sender);
+    Img.Left := Img.Left - 2;
+    Img.Top := Img.Top - 2;
+  end
+  else if Sender is TSkSvg then
+  begin
+    var
+    Svg := TSkSvg(Sender);
+    Svg.Left := Svg.Left - 2;
+    Svg.Top := Svg.Top - 2;
+  end;
 end;
 
 function StripUrlParams(const URL: string): string;
@@ -315,26 +476,59 @@ begin
     Result := URL;
 end;
 
+function BrowseForFolder(const Title: string; var FolderPath: string): Boolean;
+var
+  FileOpenDialog: IFileOpenDialog;
+  ShellItem: IShellItem;
+  pszPath: PWideChar;
+begin
+  Result := False;
+  FolderPath := '';
 
+  CoInitialize(nil);
+  try
+    if Succeeded(CoCreateInstance(CLSID_FileOpenDialog, nil,
+      CLSCTX_INPROC_SERVER, IID_IFileOpenDialog, FileOpenDialog)) then
+    begin
+      FileOpenDialog.SetOptions(FOS_PICKFOLDERS);
+      FileOpenDialog.SetTitle(PChar(Title));
+
+      if Succeeded(FileOpenDialog.Show(0)) then
+      begin
+        if Succeeded(FileOpenDialog.GetResult(ShellItem)) then
+        begin
+          // แก้ไขตรงนี้ - ใช้ตัวแปรชั่วคราวสำหรับ PWideChar
+          if Succeeded(ShellItem.GetDisplayName(SIGDN_FILESYSPATH, pszPath))
+          then
+          begin
+            FolderPath := pszPath;
+            CoTaskMemFree(pszPath); // ต้องคืนหน่วยความจำ
+            Result := True;
+          end;
+        end;
+      end;
+    end;
+  finally
+    CoUninitialize;
+  end;
+end;
 
 procedure TForm1.btn1Click(Sender: TObject);
 var
   r: Integer;
   FilePath, OldUrl, NewUrl: string;
   Lines: TStringList;
-  i: Integer;
+  I: Integer;
   Found: Boolean;
+  SelectedFolder: string;
 begin
-  if SelectDirectory('เลือกโฟลเดอร์ปลายทาง', '', Cur) then
+  // if SelectDirectory('เลือกโฟลเดอร์ปลายทาง', '', Cur) then
+  if BrowseForFolder('เลือกโฟลเดอร์ปลายทาง', SelectedFolder) then
   begin
-    lbl3.Caption := 'save to ' + Cur;
-    lbl3.Hint := Cur;
-    img5.Hint := Cur;
-    img5.ShowHint := True;
-    lbl3.ShowHint := True;
-
+    lbl3.Caption := 'save to ' + SelectedFolder;
+    Cur := SelectedFolder;
     fllst1.Directory := Cur;
-    if tglswtch1.State = tssOn then
+    if MP4 then
       fllst1.Mask := '*.mp4'
     else
       fllst1.Mask := '*.mp3';
@@ -347,11 +541,11 @@ begin
       try
         Lines.LoadFromFile(FilePath);
         Found := False;
-        for i := 0 to Lines.Count - 1 do
+        for I := 0 to Lines.Count - 1 do
         begin
-          if Lines[i].StartsWith('url ') then
+          if Lines[I].StartsWith('url ') then
           begin
-            OldUrl := Trim(Copy(Lines[i], 5, MaxInt)); // ตัด 'url '
+            OldUrl := Trim(Copy(Lines[I], 5, MaxInt)); // ตัด 'url '
             Found := True;
             Break;
           end;
@@ -360,7 +554,8 @@ begin
         if Found then
         begin
           if MessageDlg('พบ URL เดิม: ' + OldUrl + sLineBreak +
-                        'คุณต้องการใช้ URL นี้หรือไม่?', mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+            'คุณต้องการใช้ URL นี้หรือไม่?', mtConfirmation, [mbYes, mbNo], 0) = mrYes
+          then
           begin
             edt1.Text := OldUrl;
           end;
@@ -382,8 +577,6 @@ begin
   r := r - (ActivityIndicator1.Width div 2);
   ActivityIndicator1.Left := r;
 end;
-
-
 
 procedure DeleteTempDownloadFiles(const Cur: string);
 var
@@ -430,7 +623,7 @@ begin
       FindClose(SearchRec);
     end;
 
-        // Delete *.m4a.par* lly ped Your Mind) [Official MV].m4a
+    // Delete *.m4a.par* lly ped Your Mind) [Official MV].m4a
     if FindFirst(FilePath + '*.m4a.par*', faAnyFile, SearchRec) = 0 then
     begin
       repeat
@@ -491,18 +684,23 @@ begin
   end;
 end;
 
-
 procedure TForm1.btn2Click(Sender: TObject);
 var
   ExpiryDate: TDate;
-  url: string;
+
   FilePath: string;
   Lines: TStringList;
-  i: Integer;
+  I: Integer;
   Found: Boolean;
 begin
-  DeleteTempDownloadFiles(Cur);
-  url := edt1.Text;
+  // DeleteTempDownloadFiles(Cur);
+  if FPlaylist.IsEmpty then
+  begin
+    mmo1.Lines.Add('Playlist is empty');
+    Exit;
+  end;
+  sURL := FPlaylist[0]; // หรือ FPlaylist.First
+  edt1.Text := sURL;
   FilePath := IncludeTrailingPathDelimiter(Cur) + 'downloaded.txt';
 
   Lines := TStringList.Create;
@@ -511,13 +709,13 @@ begin
     if TFile.Exists(FilePath) then
     begin
       Lines.LoadFromFile(FilePath);
-      for i := 0 to Lines.Count - 1 do
+      for I := 0 to Lines.Count - 1 do
       begin
-        if Lines[i].StartsWith('url ') then
+        if Lines[I].StartsWith('url ') then
         begin
           // เปรียบเทียบเฉพาะถ้าไม่ตรงจึงค่อยอัพเดต
-          if Trim(Copy(Lines[i], 5, MaxInt)) <> url then
-            Lines[i] := 'url ' + url;
+          if Trim(Copy(Lines[I], 5, MaxInt)) <> sURL then
+            Lines[I] := 'url ' + sURL;
           Found := True;
           Break;
         end;
@@ -525,7 +723,7 @@ begin
     end;
 
     if not Found then
-      Lines.Add('url ' + url); // ยังไม่มี url ในไฟล์เลย
+      Lines.Add('url ' + sURL); // ยังไม่มี url ในไฟล์เลย
 
     Lines.SaveToFile(FilePath);
   finally
@@ -537,23 +735,61 @@ begin
   if Now > ExpiryDate then
     mmo1.Lines.Add('โปรแกรมหมดอายุ โปรดโหลดตัวใหม่')
   else
+  begin
     idthrdcmpnt2.Start;
+    ShowBalloonHintNow(sksvgcancel,
+      'หยุดดาวน์โหลดที่ปุ่มนี้.. โหลดต่อภายหลังได้');
+  end;
 end;
 
+procedure TForm1.ShowBalloonHintNow(Control: TControl; const HintText: string);
+begin
+  // ตรวจสอบว่า BalloonHint1 มีอยู่ในฟอร์ม
+  if Assigned(BalloonHint1) then
+  begin
+    Control.Hint := HintText;
+    Control.ShowHint := True;
 
+    BalloonHint1.Style := bhsBalloon; // รูปแบบลูกโป่ง
+    BalloonHint1.Delay := 2000; // แสดงทันที
+    BalloonHint1.HideAfter := 5000; // แสดงนาน 3 วินาที
+    BalloonHint1.Title := 'คำแนะนำ';
+    BalloonHint1.ImageIndex := 0;
+    // ตั้งค่าข้อความ Balloon Hint
+    BalloonHint1.Description := HintText;
 
-procedure TForm1.btn3Click(Sender: TObject); // playlist       watch
+    // แสดง Balloon Hint ทันที
+    BalloonHint1.ShowHint(Control);
+  end;
+end;
+
+procedure TForm1.btn3Click(Sender: TObject);
 var
   s: string;
 begin
   s := Clipboard.AsText;
-  if ((Pos('playlist', s) > 0) OR (Pos('watch', s) > 0)) then
+  if Pos('https://music.youtube.com/', s) = 1 then
   begin
     s := StripUrlParams(s);
-    edt1.Text := Clipboard.AsText;
+
+    // เพิ่ม URL ลงใน List (ถ้ายังไม่มี)
+    if FPlaylist.IndexOf(s) = -1 then
+    begin
+      FPlaylist.Add(s);
+      if Length(edt1.Text) = 0 then
+        edt1.Text := s;
+      SavePlaylist;
+      UpdateBadge;
+      mmo1.Lines.Add('เพิ่มลงใน Playlist แล้ว');
+      sksvgLoad.Hint := '';
+      sksvgLoad.ShowHint := False;
+      ShowBalloonHintNow(sksvgLoad, 'เริ่มดาวน์โหลดที่ปุ่มนี้');
+    end
+    else
+      mmo1.Lines.Add('URL นี้มีอยู่ใน Playlist แล้ว');
   end
   else
-    ShowMessage('คัดลอก URL Youtube เป็นลิส หรือเพลงเดียว');
+    mmo1.Lines.Add('กรุณาคัดลอก URL Youtube เป็นลิสหรือเพลงเดียว');
 
 end;
 
@@ -567,14 +803,14 @@ end;
 
 procedure TForm1.Delete1Click(Sender: TObject);
 var
-  f,s: TFileName;
+  f, s: TFileName;
 begin
   if fllst1.ItemIndex <> -1 then
   begin
     f := fllst1.FileName;
     s := ExtractFileName(f);
-    if MessageDlg('Delete this file: "' +  s + '"?',
-      mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+    if MessageDlg('Delete this file: "' + s + '"?', mtConfirmation,
+      [mbYes, mbNo], 0) = mrYes then
     begin
       if TryRemoveFile(f) then
         ShowMessage('File deleted.')
@@ -586,12 +822,6 @@ begin
     ShowMessage('Please select a file first.');
 end;
 
-procedure TForm1.edt1Change(Sender: TObject);
-begin
-
-  idthrdcmpnt1.Start;
-end;
-
 procedure TForm1.fllst1Click(Sender: TObject);
 begin
   // pm1
@@ -601,7 +831,16 @@ begin
   end;
 end;
 
-
+procedure TForm1.fllst1MouseUp(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+begin
+  if Button = mbRight then
+  begin
+    fllst1.Font.Name := 'Segoe UI';
+    fllst1.Font.Charset := DEFAULT_CHARSET;
+    fllst1.Update;
+  end;
+end;
 
 procedure TForm1.Rename1Click(Sender: TObject);
 var
@@ -641,14 +880,14 @@ end;
 
 function IsYouTubeID(const s: string): Boolean;
 var
-  i: Integer;
+  I: Integer;
 const
   ValidChars: TSysCharSet = ['a' .. 'z', 'A' .. 'Z', '0' .. '9', '-', '_'];
 begin
   Result := Length(s) = 11;
   if Result then
-    for i := 1 to 11 do
-      if not CharInSet(s[i], ValidChars) then
+    for I := 1 to 11 do
+      if not CharInSet(s[I], ValidChars) then
       begin
         Result := False;
         Break;
@@ -669,7 +908,7 @@ begin
   StartupInfo.wShowWindow := SW_HIDE;
 
   // กำหนด TEMP directory เป็น Working Directory
-  TempDir := IncludeTrailingPathDelimiter(GetEnvironmentVariable('TEMP'));
+  TempDir := Form1.info.Folders.Temp + '\';
 
   if CreateProcess(nil, PChar(CommandLine), nil, nil, False, CREATE_NO_WINDOW,
     nil, PChar(TempDir), StartupInfo, ProcessInfo) then
@@ -688,13 +927,13 @@ end;
 
 procedure TForm1.ProcessAllFiles;
 var
-  i: Integer;
+  I: Integer;
   oldName, baseName, folderName, webpFile, jpgFile, mediaFile, tempFile,
     Ext: string;
 begin
   if not FileExists(ff) then
     Exit;
-  tempFile := IncludeTrailingPathDelimiter(GetEnvironmentVariable('TEMP'));
+  tempFile := info.Folders.Temp + '\';
   folderName := ExtractFileName(ExcludeTrailingPathDelimiter(fllst1.Directory));
   mmo1.Lines.Clear;
   StopNow := False;
@@ -702,14 +941,14 @@ begin
   ActivityIndicator1.Visible := True;
   tmr1.Enabled := False;
   tmr2.Enabled := False;
-  imgStop.Visible := True;
-  for i := 0 to fllst1.Items.Count - 1 do
+
+  for I := 0 to fllst1.Items.Count - 1 do
   begin
 
     if StopNow then
       Break;
 
-    oldName := IncludeTrailingPathDelimiter(fllst1.Directory) + fllst1.Items[i];
+    oldName := IncludeTrailingPathDelimiter(fllst1.Directory) + fllst1.Items[I];
     baseName := TPath.GetFileNameWithoutExtension(oldName);
     mmo1.Lines.Add(baseName);
     Ext := LowerCase(TPath.GetExtension(oldName));
@@ -731,8 +970,7 @@ begin
         Break;
 
       mediaFile := oldName;
-      tempFile := IncludeTrailingPathDelimiter(GetEnvironmentVariable('TEMP')) +
-        baseName + Ext;
+      tempFile := info.Folders.Temp + '\' + baseName + Ext;
       mmo1.Lines.Add(tempFile);
       if Ext = '.mp3' then
       begin
@@ -784,7 +1022,7 @@ begin
   ActivityIndicator1.Visible := False;
   tmr1.Enabled := True;
   tmr2.Enabled := True;
-  imgStop.Visible := False;
+
 end;
 
 procedure TForm1.Renameall1Click(Sender: TObject);
@@ -826,6 +1064,31 @@ begin
     Result := Copy(Result, 1, LastDelimiter('.', Result) - 1);
 end;
 
+procedure ExtractNumbersUsingRegex(const s: string;
+  out current, total: Integer);
+var
+  Match: TMatch;
+  ss: string;
+begin
+  if Pos('item', s) = 1 then
+  begin
+    ss := s.Remove(0, 5).Trim;
+    Match := TRegEx.Match(ss, '^(\d+)\s+of\s+(\d+)$');
+    if not Match.Success then
+      raise Exception.Create('รูปแบบสตริงไม่ถูกต้อง');
+
+    current := StrToIntDef(Match.Groups[1].Value, 0);
+    total := StrToIntDef(Match.Groups[2].Value, 0);
+  end
+  else
+  begin
+    current := 0;
+    total := 0;
+
+  end;
+
+end;
+
 procedure TForm1.RunCommandAndCaptureOutput(const CommandLine: string);
 var
   sa: TSecurityAttributes;
@@ -837,8 +1100,8 @@ var
   output: AnsiString;
   s: string;
   j: Integer;
-
-  Progress: Double;
+  current, total: Integer;
+  Progress: double;
   ItemInfo: string;
 
 begin
@@ -849,7 +1112,7 @@ begin
 
   if not CreatePipe(hReadPipe, hWritePipe, @sa, 0) then
     Exit;
-
+  sksvgcancel.Visible := True;
   ActivityIndicator1.Enabled := True;
   ActivityIndicator1.Visible := True;
   ComboBox1.Enabled := False;
@@ -866,7 +1129,7 @@ begin
       CREATE_NO_WINDOW, nil, PChar(Cur), si, pi) then
     begin
       CloseHandle(hWritePipe);
-      imgStop.Visible := True;
+
       repeat
 
         if StopNow then
@@ -899,22 +1162,36 @@ begin
             if ItemInfo <> '' then
               TItemInfo := ItemInfo;
             if ((TProgress <> 0) AND (TItemInfo <> '')) then
-              lbl3.Caption := Format('🔄%.2f%% | 🎵%s | 📌%s'#13#10'💾: %s',
-                [TProgress, TnameMusic, TItemInfo, Cur])
+              lbl3.Caption := Cur
             else if TItemInfo <> '' then
-              mmo1.Lines.Add('start ' + TItemInfo)
+              ExtractNumbersUsingRegex(TItemInfo, current, total)
             else if TProgress <> 0 then
               mmo1.Lines.Add(TProgress.ToString);
+            if TProgress = 100 then
+            begin
+              fllst1.Visible := True;
+              spltvw1.Visible := True;
+              fllst1.Update;
+            end;
+            // procedure ExtractNumbersUsingRegex(const s: string; out current, total: Integer);
+            lblStatus.Caption := ' 🎵 ' + TnameMusic + ' ';
+            lblStatus1.Caption := ' 📌 ' + TItemInfo + ' ';
+            lblStatus2.Caption := Format(' 🔄 %.2f%% ', [TProgress]);
+            prog1.Position := Trunc(TProgress);
+            prog2.Max := total;
+            prog2.Position := current;
 
           end
           else if Pos('s/12563', s) > 1 then
           begin
-          {WARNING: [youtube] a1wW0AjQCI8: Some tv client https formats have been skipped as they are
-DRM protected. The current session may have an experiment that applies DRM to all videos on the tv client. See
- https://github.com/yt-dlp/yt-dlp/issues/12563  for more details.}
-              mmo1.Lines.Add('❗ บางฟอร์แมตที่เป็น tv client https ถูกข้ามไป เพราะมันถูกป้องกันด้วย DRM (Digital Rights Management)'+
-'และ session ปัจจุบันอาจจะมี "experiment" บางอย่างจากฝั่ง YouTube ที่บังคับใช้ DRM กับทุกวิดีโอ เมื่อโหลดผ่าน client แบบ TV หมายถึง รองรับ MP4');
-          end else
+            { WARNING: [youtube] a1wW0AjQCI8: Some tv client https formats have been skipped as they are
+              DRM protected. The current session may have an experiment that applies DRM to all videos on the tv client. See
+              https://github.com/yt-dlp/yt-dlp/issues/12563  for more details. }
+            mmo1.Lines.Add
+              ('❗ บางฟอร์แมตที่เป็น tv client https ถูกข้ามไป เพราะมันถูกป้องกันด้วย DRM (Digital Rights Management)'
+              + 'และ session ปัจจุบันอาจจะมี "experiment" บางอย่างจากฝั่ง YouTube ที่บังคับใช้ DRM กับทุกวิดีโอ เมื่อโหลดผ่าน client แบบ TV หมายถึง รองรับ MP4');
+          end
+          else
 
             mmo1.Lines.Add(s);
         end;
@@ -923,7 +1200,7 @@ DRM protected. The current session may have an experiment that applies DRM to al
       WaitForSingleObject(pi.hProcess, INFINITE);
       CloseHandle(pi.hProcess);
       CloseHandle(pi.hThread);
-      imgStop.Visible := False;
+
     end;
 
     // Result := string(output); // แปลง AnsiString → Unicode
@@ -932,30 +1209,68 @@ DRM protected. The current session may have an experiment that applies DRM to al
   end;
   ActivityIndicator1.Enabled := False;
   ActivityIndicator1.Visible := False;
-  imgStop.Visible := False;
+  sksvgcancel.Visible := False;
   ComboBox1.Enabled := True;
+  if not FPlaylist.IsEmpty then
+  begin
+    j := FPlaylist.IndexOf(sURL);
+    if ((j <> -1) AND (StopNow = False)) then
+      delFPlaylist(j);
+  end;
+end;
+
+procedure TForm1.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  // หากใช้ Timer
+  tmr1.Enabled := False;
+  tmr2.Enabled := False;
+  tmSlide.Enabled := False;
+
+  if idthrdcmpnt2.Active then
+  begin
+    idthrdcmpnt2.Terminate;
+    idthrdcmpnt2.WaitFor;
+  end;
+  if idthrdcmpnt3.Active then
+  begin
+    idthrdcmpnt3.Terminate;
+    idthrdcmpnt3.WaitFor; // KillProc   ProcThumbnail
+  end;
+  if KillProc.Active then
+  begin
+    KillProc.Terminate;
+    KillProc.WaitFor;
+  end;
+  if ProcThumbnail.Active then
+  begin
+    ProcThumbnail.Terminate;
+    ProcThumbnail.WaitFor;
+  end;
+
+  Action := caFree; // ปิดฟอร์มอย่างสมบูรณ์
 end;
 
 procedure TForm1.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 var
   Ini: TIniHelper;
   p: string;
-  i: Integer;
+  I: Integer;
 begin
+  StopNow := True;
+  KillProc.Start;
   p := ExtractFilePath(ParamStr(0));
-  Ini := TIniHelper.Create(p + 'config.ini');
+  Ini := TIniHelper.Create(info.Folders.Temp + '\config.ini');
   Ini.WriteString('setting', 'Cur', Cur);
   Ini.WriteString('setting', 'links', edt1.Text);
-  if tglswtch1.State = tssOn then
-    Ini.WriteBool('setting', 'tglswtch1', True)
-  else
-    Ini.WriteBool('setting', 'tglswtch1', False);
+  Ini.WriteInteger('setting', 'cmbQuality', cmbQuality.ItemIndex);
+  Ini.WriteBool('setting', 'MP3', MP3);
+  Ini.WriteBool('setting', 'MP4', not MP3);
   Ini.WriteInteger('setting', 'style', ComboBox1.ItemIndex);
-  for i := 0 to ComboBox1.Items.Count - 1 do
+  for I := 0 to ComboBox1.Items.Count - 1 do
   begin
-    p := ComboBox1.Items[i];
-    Ini.WriteString('style', IntToStr(i), p);
-    Ini.WriteInteger('style', 'count', i);
+    p := ComboBox1.Items[I];
+    Ini.WriteString('style', IntToStr(I), p);
+    Ini.WriteInteger('style', 'count', I);
   end;
   Ini.Free;
 end;
@@ -1180,9 +1495,8 @@ end;
 
 procedure TForm1.FormCreate(Sender: TObject);
 var
-  i, c: Integer;
   Ini: TIniHelper;
-  p, s: string;
+  p: string;
   DllPath: string;
 
 begin
@@ -1191,51 +1505,79 @@ begin
   ActivityIndicator1.Visible := False;
   StyleManager := TStyleManager.Create;
   p := ExtractFilePath(ParamStr(0));
-  Ini := TIniHelper.Create(p + 'config.ini');
+  Ini := TIniHelper.Create(info.Folders.Temp + '\config.ini');
+
+  FPlaylist := TStringList.Create;
+  FPlaylist.Duplicates := dupIgnore; // ไม่เก็บ URL ซ้ำ
+  FPlaylist.Sorted := True; // เรียงลำดับอัตโนมัติ
+
+  FIniHelper := TIniHelper.Create(info.Folders.Temp + '\playlist.ini');
+  LoadPlaylist;
+  UpdateBadge;
+
   SlideStep := 0;
   SlideDirection := 1;
-  c := Ini.ReadInteger('style', 'count', 0);
-  if c > 0 then
-  begin
-    for i := 0 to c do
+  cmbQuality.Items.Clear;
+  cmbQuality.Items.Add('fast');
+  cmbQuality.Items.Add('balanced');
+  cmbQuality.Items.Add('Restore Quality');
+  cmbQuality.ItemIndex := Ini.ReadInteger('setting', 'cmbQuality', 0);
+  MP3 := Ini.ReadBool('setting', 'MP3', False);
+  MP4 := not MP3;
+  ToggleMP3MP4();
+  {
+    c := Ini.ReadInteger('style', 'count', 0);
+    if c > 0 then
     begin
-      s := Ini.ReadString('style', IntToStr(i), '');
-      if Length(s) > 1 then
+    for I := 0 to c do
+    begin
+    s := Ini.ReadString('style', IntToStr(I), '');
+    if Length(s) > 1 then
 
-        ComboBox1.Items.Add(s);
+    ComboBox1.Items.Add(s);
     end;
-  end
-  else
-  begin
-    for i := 0 to Length(TStyleManager.StyleNames) - 1 do
-      ComboBox1.Items.Add(TStyleManager.StyleNames[i]);
-  end;
+    end
+    else
+    begin
+    for I := 0 to Length(TStyleManager.StyleNames) - 1 do
+    ComboBox1.Items.Add(TStyleManager.StyleNames[I]);
+    end; }
   ComboBox1.ItemIndex := Ini.ReadInteger('setting', 'style', 15);
   Cur := Ini.ReadString('setting', 'Cur', p);
+  if not System.SysUtils.DirectoryExists(Cur) then
+  // [dcc64 Warning] Unit1.pas(1488): W1000 Symbol 'DirectoryExists' is deprecated: 'Use SysUtils.DirectoryExists instead'
+  begin
+    // ถ้าโฟลเดอร์ถูกลบไปแล้ว ให้สร้างโฟลเดอร์ใหม่
+    if not CreateDir(Cur) then
+    begin
+      ShowMessage('ไม่สามารถสร้างโฟลเดอร์: ' + Cur);
+      Cur := p; // ใช้ค่า default ถ้าสร้างใหม่ไม่ได้
+    end;
+  end;
+  // https://music.youtube.com/new_releases/albums
+
   artist := Ini.ReadString('default', 'artist', '');
-  if artist='' then Ini.WriteString('default', 'artist', 'ดาบดำ');
+  if artist = '' then
+    Ini.WriteString('default', 'artist', 'ดาบดำ');
   album := Ini.ReadString('default', 'album', '');
-  if album='' then Ini.WriteString('default', 'album', 'ตะบันหู');
+  if album = '' then
+    Ini.WriteString('default', 'album', 'ตะบันหู');
   genre := Ini.ReadString('default', 'genre', '');
-  if genre='' then Ini.WriteString('default', 'genre', 'DEV ROCK');
+  if genre = '' then
+    Ini.WriteString('default', 'genre', 'DEV ROCK');
   lbl3.Caption := 'save to ' + Cur;
   lbl3.Hint := Cur;
-  img5.Hint := Cur;
+
   crdpnl1.ActiveCard := crd1;
   fllst1.Directory := Cur;
   StartWatching(Cur);
   tmr1.Interval := 1000;
   tmr1.Enabled := True;
 
-  img5.ShowHint := True;
   lbl3.ShowHint := True;
   edt1.Text := StripUrlParams(Ini.ReadString('setting', 'links',
     'https://music.youtube.com/playlist?list=PLT7YIx5xXTI_5jd0raarWZ63lkdhR7fKE')
     );
-  if Ini.ReadBool('setting', 'tglswtch1', True) then
-    tglswtch1.State := tssOn
-  else
-    tglswtch1.State := tssOff;
 
   Ini.Free;
 
@@ -1245,13 +1587,15 @@ begin
   else if FileExists(p + 'youtube.dll') then
     Pathdll := p + 'youtube.dll';
 
-  tglswtch1Click(Self);
   ComboBox1Change(Self);
 end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
 begin
   StopWatching;
+  SavePlaylist;
+  FPlaylist.Free;
+  FIniHelper.Free;
 end;
 
 procedure TForm1.FormResize(Sender: TObject);
@@ -1283,14 +1627,27 @@ begin
   end;
 end;
 
+var
+  FLastChangeCheck: UInt64 = 0;
+
 procedure TForm1.CheckForChanges;
+const
+  CHECK_INTERVAL_MS = 10000; // 10 วินาที
+var
+  nowTick: UInt64;
 begin
+  nowTick := GetTickCount64;
+  // ตรวจว่าผ่านไป 10 วิหรือยัง
+  if nowTick - FLastChangeCheck < CHECK_INTERVAL_MS then
+    Exit;
+
   if (FChangeHandle <> 0) and (WaitForSingleObject(FChangeHandle, 0)
     = WAIT_OBJECT_0) then
   begin
     fllst1.Update;
     // ตั้งค่าสำหรับการเฝ้ารอบถัดไป
     FindNextChangeNotification(FChangeHandle);
+    FLastChangeCheck := nowTick;
   end;
 end;
 
@@ -1299,17 +1656,31 @@ begin
   StyleManager.TrySetStyle(ComboBox1.Text);
 end;
 
-procedure TForm1.idthrdcmpnt1Run(Sender: TIdThreadComponent);
-begin
-  // mmo1.text := runcommandandcaptureoutputinfo (Pathdll + ' --print "%(playlist_title)s (%(playlist_count)s เพลง)" "' + edt1.Text +'"', cur);
-  idthrdcmpnt1.Stop;
-end;
+var
+  URL: string;
 
 procedure TForm1.idthrdcmpnt2Run(Sender: TIdThreadComponent);
 begin
+  sksvgLoad.Enabled := False;
+  cmbQuality.Visible := False;
   idthrdcmpnt2.Stop;
-  RunCommandAndCaptureOutput(Pathdll + ' ' + command + ' ' + edt1.Text);
-
+  Sleep(1000);
+  StopNow := False;
+  URL := '';
+  while ((not Application.Terminated) AND (not FPlaylist.IsEmpty) AND
+    (not StopNow)) do
+  begin
+    Sleep(1000);
+    if URL <> FPlaylist[0] then
+    begin
+      URL := FPlaylist[0];
+      sURL := FPlaylist[0];
+      edt1.Text := sURL;
+      RunCommandAndCaptureOutput(Pathdll + ' ' + command + ' ' + sURL);
+    end;
+  end;
+  sksvgLoad.Enabled := True;
+  cmbQuality.Visible := True;
 end;
 
 procedure TForm1.idthrdcmpnt3Run(Sender: TIdThreadComponent);
@@ -1322,6 +1693,7 @@ procedure TForm1.KillProcRun(Sender: TIdThreadComponent);
 begin
   KillProc.Stop;
   KillProcessesByName(['yt-dlp.exe', 'youtube.dll']);
+
 end;
 
 procedure TForm1.imgDirecXClick(Sender: TObject);
@@ -1334,58 +1706,51 @@ begin
   // Winapi.ShellAPI;
 end;
 
-
-function RunAndGetOutput(const Command: string): string;
+function RunAndGetOutput(const command: string): string;
 var
-  SA: TSecurityAttributes;
+  sa: TSecurityAttributes;
   StdOutRd, StdOutWr: THandle;
-  SI: TStartupInfo;
-  PI: TProcessInformation;
-  Buffer: array[0..1023] of AnsiChar;
-  BytesRead: DWORD;
-  Output: AnsiString;
+  si: TStartupInfo;
+  pi: TProcessInformation;
+  buffer: array [0 .. 1023] of AnsiChar;
+  bytesRead: DWORD;
+  output: AnsiString;
   TempDir: string;
 begin
   Result := '';
-  FillChar(SA, SizeOf(SA), 0);
-  SA.nLength := SizeOf(SA);
-  SA.bInheritHandle := True;
+  FillChar(sa, SizeOf(sa), 0);
+  sa.nLength := SizeOf(sa);
+  sa.bInheritHandle := True;
 
-  if not CreatePipe(StdOutRd, StdOutWr, @SA, 0) then Exit;
+  if not CreatePipe(StdOutRd, StdOutWr, @sa, 0) then
+    Exit;
   try
-    FillChar(SI, SizeOf(SI), 0);
-    SI.cb := SizeOf(SI);
-    SI.dwFlags := STARTF_USESTDHANDLES or STARTF_USESHOWWINDOW;
-    SI.hStdOutput := StdOutWr;
-    SI.hStdError := StdOutWr;
-    SI.wShowWindow := SW_HIDE;
+    FillChar(si, SizeOf(si), 0);
+    si.cb := SizeOf(si);
+    si.dwFlags := STARTF_USESTDHANDLES or STARTF_USESHOWWINDOW;
+    si.hStdOutput := StdOutWr;
+    si.hStdError := StdOutWr;
+    si.wShowWindow := SW_HIDE;
 
-    TempDir := GetEnvironmentVariable('TEMP'); // ใช้เป็น current directory
+    TempDir := Form1.info.Folders.Temp;
 
-    if CreateProcess(
-      nil,
-      PChar('cmd.exe /C ' + Command),
-      nil,
-      nil,
-      True,
-      CREATE_NO_WINDOW,
-      nil,
-      PChar(TempDir), // Set current directory เป็น TEMP
-      SI,
-      PI) then
+    if CreateProcess(nil, PChar('cmd.exe /C ' + command), nil, nil, True,
+      CREATE_NO_WINDOW, nil, PChar(TempDir), // Set current directory เป็น TEMP
+      si, pi) then
     begin
       CloseHandle(StdOutWr);
       try
-        while ReadFile(StdOutRd, Buffer, SizeOf(Buffer), BytesRead, nil) do
+        while ReadFile(StdOutRd, buffer, SizeOf(buffer), bytesRead, nil) do
         begin
-          if BytesRead = 0 then Break;
-          Output := Output + Copy(Buffer, 1, BytesRead);
+          if bytesRead = 0 then
+            Break;
+          output := output + Copy(buffer, 1, bytesRead);
         end;
-        WaitForSingleObject(PI.hProcess, INFINITE);
-        CloseHandle(PI.hProcess);
-        CloseHandle(PI.hThread);
+        WaitForSingleObject(pi.hProcess, INFINITE);
+        CloseHandle(pi.hProcess);
+        CloseHandle(pi.hThread);
       finally
-        Result := string(Output);
+        Result := string(output);
       end;
     end;
   finally
@@ -1393,10 +1758,9 @@ begin
   end;
 end;
 
-
 function GetShortPath(const LongPath: string): string;
 var
-  buffer: array[0..MAX_PATH-1] of Char;
+  buffer: array [0 .. MAX_PATH - 1] of Char;
 begin
   if GetShortPathName(PChar(LongPath), buffer, MAX_PATH) > 0 then
     Result := string(buffer)
@@ -1404,13 +1768,12 @@ begin
     Result := LongPath;
 end;
 
-
 function IsVideoValid(const FileName: string): Boolean;
 var
-  Output, Command, TempFFProbe, SafeFile, Ext: string;
+  output, command, TempFFProbe, SafeFile, Ext: string;
 begin
   Result := False;
-  TempFFProbe := IncludeTrailingPathDelimiter(GetEnvironmentVariable('TEMP')) + 'ffprobe.exe';
+  TempFFProbe := Form1.info.Folders.Temp + '\ffprobe.exe';
 
   if not FileExists(TempFFProbe) then
   begin
@@ -1426,55 +1789,58 @@ begin
 
   // หานามสกุลไฟล์จริง ๆ เพื่อ copy แล้วไม่พลาด
   Ext := ExtractFileExt(FileName);
-  SafeFile := IncludeTrailingPathDelimiter(GetEnvironmentVariable('TEMP')) + 'a' + Ext;
+  SafeFile := Form1.info.Folders.Temp + '\a' + Ext;
 
   // Copy ไป temp
   CopyFile(PChar(FileName), PChar(SafeFile), False);
 
   try
     // รัน ffprobe ที่ TEMP ด้วยชื่อไฟล์ปลอดภัย
-    Command := 'ffprobe -v error ' + 'a' + Ext ;
-    Output := RunAndGetOutput(Command);
+    command := 'ffprobe -v error ' + 'a' + Ext;
+    output := RunAndGetOutput(command);
 
     // ffprobe จะไม่มี output ถ้าไฟล์ปกติ
-    Result := Trim(Output) = '';
+    Result := Trim(output) = '';
 
-    Command := 'ffprobe -v error -select_streams a:0 -show_entries stream=duration -of default=noprint_wrappers=1:nokey=1 a' + Ext ;
-     Output := RunAndGetOutput(Command);
-     form1.mmo1.Lines.Add(' length '+ Output + ' < '+FileName);
+    command :=
+      'ffprobe -v error -select_streams a:0 -show_entries stream=duration -of default=noprint_wrappers=1:nokey=1 a'
+      + Ext;
+    output := RunAndGetOutput(command);
+    Form1.mmo1.Lines.Add(' length ' + output + ' < ' + FileName);
   finally
     // ลบไฟล์ชั่วคราวทิ้ง
     DeleteFile(SafeFile);
   end;
 end;
 
-
-
 procedure TForm1.imgRecheckClick(Sender: TObject);
 var
-  i: Integer;
+  I: Integer;
   FileName: string;
 begin
-  if fllst1.Items.Count = 0 then Exit;
+  if fllst1.Items.Count = 0 then
+    Exit;
 
-  for i := 0 to fllst1.Items.Count - 1 do
+  for I := 0 to fllst1.Items.Count - 1 do
   begin
-    FileName := IncludeTrailingPathDelimiter(Cur) + fllst1.Items[i];
+    FileName := IncludeTrailingPathDelimiter(Cur) + fllst1.Items[I];
     if IsVideoValid(FileName) then
-      mmo1.Lines.Add('✅ OK: ' + fllst1.Items[i])
+      mmo1.Lines.Add('✅ OK: ' + fllst1.Items[I])
     else
     begin
-      mmo1.Lines.Add('❌ Invalid: ' + fllst1.Items[i]);
+      mmo1.Lines.Add('❌ Invalid: ' + fllst1.Items[I]);
       TryRemoveFile(FileName);
     end;
   end;
 end;
 
-
 procedure TForm1.imgRefClick(Sender: TObject);
 begin
-ProcThumbnail.Start;
-//fllst1.Update;
+  ProcThumbnail.Start;
+            fllst1.Font.Charset := THAI_CHARSET;
+            lblStatus2.Font.Charset := THAI_CHARSET;
+            lblStatus1.Font.Charset := THAI_CHARSET;
+            lblStatus.Font.Charset := THAI_CHARSET;
 end;
 
 procedure TForm1.imgStopClick(Sender: TObject);
@@ -1510,7 +1876,7 @@ const
   SlideSteps = 20;
   SlideDelay = 10;
 var
-  i, delta: Integer;
+  I, delta: Integer;
   OldCard: TCard;
 begin
   OldCard := CardPanel.ActiveCard;
@@ -1524,7 +1890,7 @@ begin
 
   delta := CardPanel.Width div SlideSteps;
 
-  for i := 1 to SlideSteps do
+  for I := 1 to SlideSteps do
   begin
     Application.ProcessMessages;
     Sleep(SlideDelay);
@@ -1570,10 +1936,43 @@ procedure TForm1.lblPROClick(Sender: TObject);
 var
   URL: string;
 begin
-  URL := 'https://www.backswv.com/pro';
+  URL := ('https://www.backswv.com/index.php?pro=freeloadyoutubemusic');
+
   URL := StringReplace(URL, '"', '%22', [rfReplaceAll]);
   ShellExecute(0, 'open', PChar(URL), nil, nil, SW_SHOWNORMAL);
-  // Winapi.ShellAPI;
+end;
+
+procedure TForm1.lblStatus1MouseUp(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+begin
+  if Button = mbRight then
+  begin
+    lblStatus1.Font.Name := 'Segoe UI';
+    lblStatus1.Font.Charset := THAI_CHARSET;
+    lblStatus1.Update;
+  end;
+end;
+
+procedure TForm1.lblStatus2MouseUp(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+begin
+  if Button = mbRight then
+  begin
+    lblStatus2.Font.Name := 'Segoe UI';
+    lblStatus2.Font.Charset := THAI_CHARSET;
+    lblStatus2.Update;
+  end;
+end;
+
+procedure TForm1.lblStatusMouseUp(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+begin
+  if Button = mbRight then
+  begin
+    lblStatus.Font.Name := 'Segoe UI';
+    lblStatus.Font.Charset := THAI_CHARSET;
+    lblStatus.Update;
+  end;
 end;
 
 procedure TForm1.Play1Click(Sender: TObject);
@@ -1590,48 +1989,62 @@ begin
     ShowMessage('กรุณาเลือกไฟล์ก่อน');
 end;
 
-procedure TForm1.tglswtch1Click(Sender: TObject);
+procedure TForm1.tglswtch1Click();
 var
   r: Integer;
 begin
+  // จัดตำแหน่ง ActivityIndicator
   r := lbl3.Width div 2;
   r := r - (ActivityIndicator1.Width div 2);
   ActivityIndicator1.Left := r;
-  fllst1.Directory := Cur;
-  if tglswtch1.State = tssOn then
-  begin
-command :=
-  '-f bestvideo[ext=mp4]+bestaudio[ext=m4a]/best ' +
-  '--add-metadata ' +
-  '--embed-thumbnail ' +
-  '--no-post-overwrites ' +
-  '--merge-output-format mp4 ' +
-  '--download-archive downloaded.txt ' +
-  '--output "%(title)s.%(ext)s"';
-fllst1.Mask := '*.mp4';
 
+  fllst1.Directory := Cur;
+
+  if MP4 then
+  begin
+    // โหมดดาวน์โหลด MP4 (วิดีโอ)
+    case cmbQuality.ItemIndex of
+      0: // 'low':
+        command := '-f "best[height<=480]" --merge-output-format mp4';
+      // ใช้ best เพื่อให้ได้ทั้งวิดีโอและเสียง
+      1: // 'medium':
+        command := '-f "best[height<=720]" --merge-output-format mp4';
+      2: // 'high':
+        command := '-f "best[height<=1080]" --merge-output-format mp4';
+    else
+      command := '-f "best" --merge-output-format mp4';
+    end;
+
+    command := command +
+      ' --continue --embed-thumbnail --download-archive downloaded.txt --output "%(title)s.%(ext)s"';
+    fllst1.Mask := '*.mp4';
   end
   else
-  begin             //
-command :=
-  '-f bestaudio[ext=m4a]/bestaudio ' +
-  '--extract-audio --audio-format mp3 ' +
-  '--embed-thumbnail --add-metadata ' +
-  '--metadata artist="'+artist+'" ' +
-  '--metadata album="'+album+'" ' +
-  '--metadata genre="'+genre+'" ' +
-  '--no-post-overwrites ' +
-  '--download-archive downloaded.txt ' +
-  '--output "%(title)s.%(ext)s"';
+  begin
+    // โหมดดาวน์โหลด MP3 (เสียง) (เดิม)
+    case cmbQuality.ItemIndex of
+      0: // 'low':
+        command := '-x --audio-format mp3 --audio-quality 9';
+      1: // 'medium':
+        command := '-x --audio-format mp3 --audio-quality 5';
+      2: // 'high':
+        command := '-x --audio-format mp3 --audio-quality 0';
+    else
+      command := '-x --audio-format mp3 --audio-quality 5';
+    end;
 
-fllst1.Mask := '*.mp3';
+    command := command + ' --continue --embed-thumbnail --add-metadata' +
+      ' --metadata artist="' + artist + '"' + ' --metadata album="' + album +
+      '"' + ' --metadata genre="' + genre + '"' +
+      ' --no-post-overwrites --download-archive downloaded.txt' +
+      ' --output "%(title)s.%(ext)s"';
+    fllst1.Mask := '*.mp3';
   end;
-
 end;
 
 procedure TForm1.tglswtch2Click(Sender: TObject);
 begin
-  if tglswtch1.State = tssOn then
+  if MP4 then
   begin
     command := '-f best';
   end
@@ -1643,10 +2056,7 @@ procedure TForm1.tmr1Timer(Sender: TObject);
 var
   r: Integer;
 begin
-
- imgRecheck.Visible := not ActivityIndicator1.Visible ;
-
-
+  tmr1.Interval := 30000;
   CheckForChanges;
   if fllst1.Items.Count = 0 then
   begin
@@ -1704,6 +2114,49 @@ begin
   SwitchCardAnimated;
 end;
 
+procedure TForm1.ToggleMP3MP4();
+begin
+  tglswtch1Click();
+  if MP3 then
+  begin
+    // ตั้งค่าสำหรับ MP3 (Active)
+    btnMP3.Svg.OverrideColor := TAlphaColorRec.Yellowgreen;
+    btnMP3.Width := 32;
+    btnMP3.Height := 50;
+
+    // ตั้งค่าสำหรับ MP4 (Inactive)
+    btnMP4.Svg.OverrideColor := TAlphaColorRec.Null;
+    btnMP4.Width := 16;
+    btnMP4.Height := 25;
+  end
+  else
+  begin
+    // ตั้งค่าสำหรับ MP4 (Active)
+    btnMP4.Svg.OverrideColor := TAlphaColorRec.Yellowgreen;
+    btnMP4.Width := 32;
+    btnMP4.Height := 50;
+
+    // ตั้งค่าสำหรับ MP3 (Inactive)
+    btnMP3.Svg.OverrideColor := TAlphaColorRec.Null;
+    btnMP3.Width := 16;
+    btnMP3.Height := 25;
+  end;
+end;
+
+procedure TForm1.btnMP3Click(Sender: TObject);
+begin
+  MP3 := not MP3;
+  MP4 := not MP4;
+  ToggleMP3MP4();
+end;
+
+procedure TForm1.btnMP4Click(Sender: TObject);
+begin
+  MP3 := not MP3;
+  MP4 := not MP4;
+  ToggleMP3MP4();
+end;
+
 procedure TForm1.crdpnl1Gesture(Sender: TObject;
   const EventInfo: TGestureEventInfo; var Handled: Boolean);
 begin
@@ -1720,12 +2173,12 @@ end;
 
 procedure TForm1.ProcessAllFiles2;
 var
-  i: Integer;
+  I: Integer;
   oldName, baseName, folderName, webpFile, jpgFile, mediaFile, tempFile, Ext,
     TempDir: string;
 begin
   try
-    TempDir := IncludeTrailingPathDelimiter(GetEnvironmentVariable('TEMP'));
+    TempDir := info.Folders.Temp + '\';
 
     if not System.SysUtils.DirectoryExists(TempDir) then
     begin
@@ -1742,13 +2195,13 @@ begin
     folderName := ExtractFileName
       (ExcludeTrailingPathDelimiter(fllst1.Directory));
 
-    for i := 0 to fllst1.Items.Count - 1 do
+    for I := 0 to fllst1.Items.Count - 1 do
     begin
       if Application.Terminated then
         Break;
 
       oldName := IncludeTrailingPathDelimiter(fllst1.Directory) +
-        fllst1.Items[i];
+        fllst1.Items[I];
 
       if not FileExists(oldName) then
       begin
@@ -1956,18 +2409,24 @@ end;
 procedure TForm1.ProcThumbnailRun(Sender: TIdThreadComponent);
 
 begin
-  ProcThumbnail.Stop;
+sleep(1000);
+ Exit;
+  if not Application.Terminated then
+  begin
+    ProcThumbnail.Stop;
 
-  if not FileExists(ff) then
-    Exit;
-  if not System.SysUtils.DirectoryExists(Cur) then
-  Exit;
-  if fllst1.Items.Count <= 0 then
-    Exit;
-  KillStuckFFmpegProcesses;
+    if not FileExists(ff) then
+      Exit;
+    if not System.SysUtils.DirectoryExists(Cur) then
+      Exit;
+    if fllst1.Items.Count <= 0 then
+      Exit;
+    KillStuckFFmpegProcesses;
 
-  ProcessAllFiles2;
-  fllst1.Update;
+    ProcessAllFiles2;
+    fllst1.Update;
+  end;
+
 end;
 
 procedure TForm1.KillStuckFFmpegProcesses;

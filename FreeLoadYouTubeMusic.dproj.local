@@ -3,30 +3,35 @@
 	<Transactions>
     <Transaction>2025/05/19 03:35:35.000.634,=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
     <Transaction>2025/05/22 00:24:36.000.409,=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
-    <Transaction>2025/05/22 00:25:03.000.533,C:\Users\bon\Documents\Embarcadero\Studio\Projects\Unit1.dfm=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\Unit1.dfm</Transaction>
-    <Transaction>2025/05/22 00:25:03.000.533,C:\Users\bon\Documents\Embarcadero\Studio\Projects\Unit1.pas=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\Unit1.pas</Transaction>
-    <Transaction>2025/05/22 00:25:07.000.674,C:\Users\bon\Documents\Embarcadero\Studio\Projects\Project1.dproj=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\Project1.dproj</Transaction>
+    <Transaction>2025/05/22 00:25:03.000.533,C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\Unit1.dfm=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Unit1.dfm</Transaction>
+    <Transaction>2025/05/22 00:25:03.000.533,C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\Unit1.pas=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2025/05/22 00:25:07.000.674,C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\Project1.dproj=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
     <Transaction>2025/05/24 22:13:19.000.774,=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\Unit2.pas</Transaction>
-    <Transaction>2025/05/24 22:13:33.000.613,C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\uIniHelper.pas=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\Unit2.pas</Transaction>
-    <Transaction>2025/05/25 03:40:03.000.215,C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\Project1.dproj=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\FreeLoadYouTubeMusic.dproj</Transaction>
+    <Transaction>2025/05/24 22:13:33.000.613,C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\Unit2.pas=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\uIniHelper.pas</Transaction>
+    <Transaction>2025/05/25 03:40:03.000.215,C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\FreeLoadYouTubeMusic.dproj=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\Project1.dproj</Transaction>
     <Transaction>2025/05/25 04:46:05.000.153,=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\Win32\Debug\youtube.dll</Transaction>
     <Transaction>2025/05/25 05:16:40.000.718,=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\youtube.dll</Transaction>
     <Transaction>2025/05/25 05:16:40.000.526,C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\Win32\Debug\youtube.dll=</Transaction>
     <Transaction>2025/05/25 05:19:23.000.226,C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\youtube.dll=</Transaction>
     <Transaction>2025/05/25 05:20:33.000.113,=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\youtube.dll</Transaction>
     <Transaction>2025/05/25 16:10:42.000.966,=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\Untitled1.md</Transaction>
-    <Transaction>2025/05/25 16:11:03.000.988,C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\README.md=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\Untitled1.md</Transaction>
+    <Transaction>2025/05/25 16:11:03.000.988,C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\Untitled1.md=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\README.md</Transaction>
     <Transaction>2025/05/25 16:33:04.000.425,=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\screenshot.png</Transaction>
     <Transaction>2025/05/26 03:53:46.000.922,=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\bin\avcodec-62.dll</Transaction>
-    <Transaction>2025/05/26 03:53:47.000.332,=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\bin\avdevice-62.dll</Transaction>
     <Transaction>2025/05/26 03:53:47.000.438,=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\bin\avfilter-11.dll</Transaction>
+    <Transaction>2025/05/26 03:53:47.000.332,=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\bin\avdevice-62.dll</Transaction>
     <Transaction>2025/05/26 03:53:47.000.628,=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\bin\avformat-62.dll</Transaction>
-    <Transaction>2025/05/26 03:53:48.000.666,=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\backswv-fb.png</Transaction>
     <Transaction>2025/05/26 03:53:48.000.512,=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\bin\avutil-60.dll</Transaction>
-    <Transaction>2025/05/26 03:53:49.000.217,=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\bin\ffplay.exe</Transaction>
-    <Transaction>2025/05/26 03:53:49.000.712,=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\bin\swscale-9.dll</Transaction>
-    <Transaction>2025/05/26 03:53:49.000.073,=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\bin\ffmpeg.exe</Transaction>
+    <Transaction>2025/05/26 03:53:48.000.666,=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\backswv-fb.png</Transaction>
     <Transaction>2025/05/26 03:53:49.000.562,=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\bin\swresample-6.dll</Transaction>
     <Transaction>2025/05/26 03:53:49.000.392,=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\bin\ffprobe.exe</Transaction>
+    <Transaction>2025/05/26 03:53:49.000.217,=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\bin\ffplay.exe</Transaction>
+    <Transaction>2025/05/26 03:53:49.000.073,=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\bin\ffmpeg.exe</Transaction>
+    <Transaction>2025/05/26 03:53:49.000.712,=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\bin\swscale-9.dll</Transaction>
+    <Transaction>2025/05/27 05:52:18.000.406,=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\Unit2.pas</Transaction>
+    <Transaction>2025/05/27 05:52:42.000.204,C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\FileDragHelper.pas=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\Unit2.pas</Transaction>
+    <Transaction>2025/05/27 05:56:40.000.328,C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\FileDragHelper.pas=</Transaction>
+    <Transaction>2025/05/29 01:22:16.012,=C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\Unit2.pas</Transaction>
+    <Transaction>2025/05/29 01:52:55.190,C:\Users\bon\Documents\Embarcadero\Studio\Projects\Adv\Unit2.pas=</Transaction>
   </Transactions>
 </BorlandProject>
